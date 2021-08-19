@@ -14,26 +14,8 @@ J_list = np.loadtxt("Nuclei.txt", usecols=(2,))
 Jvals = dict(zip(target_list, J_list))
 Avals = dict(zip(target_list, A_list))
 
-import matplotlib.pyplot as plt 
-from matplotlib import rc
-plt.rc('font', **{'family':'serif','size':20})
-plt.rc('text', usetex=True)
-plt.rc('xtick', labelsize=20)
-plt.rc('ytick', labelsize=20)
-plt.rcParams['axes.linewidth'] = 1
-plt.rcParams['xtick.major.size'] = 6
-plt.rcParams['xtick.major.width'] = 1
-plt.rcParams['xtick.minor.size'] = 3
-plt.rcParams['xtick.minor.width'] = 1
-plt.rcParams['ytick.major.size'] = 6
-plt.rcParams['ytick.major.width'] = 1
-plt.rcParams['ytick.minor.size'] = 3
-plt.rcParams['ytick.minor.width'] = 1
-plt.rcParams['xtick.direction'] = 'in'
-plt.rcParams['ytick.direction'] = 'in'
-plt.rcParams['xtick.major.pad'] = 8
-plt.rcParams['xtick.top'] = True
-plt.rcParams['ytick.right'] = True
+import matplotlib.pyplot as plt
+from matplotlib import rc, rcParams
 
 
 #---------------------------------------------------------
@@ -175,9 +157,9 @@ def Nevents_xenon(Eth, exposure, m_x, sigma):
 
 def plot_spec(m_x, sigma):
   Er = np.linspace(0.01, 200, 200)
-  plt.semilogy(Er, dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma), label=r'$\textrm{Xe}$')
-  plt.semilogy(Er, dRdE_standard(Er, 18, Avals['Ar40']-18,  m_x, sigma), label=r'$\textrm{Ar}$')
-  plt.semilogy(Er, dRdE_standard(Er, 32, Avals['Ge74']-32,  m_x, sigma), label=r'$\textrm{Ge}$')
+  plt.semilogy(Er, dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma), label=r'$\rm Xe}$')
+  plt.semilogy(Er, dRdE_standard(Er, 18, Avals['Ar40']-18,  m_x, sigma), label=r'${\rm Ar}$')
+  plt.semilogy(Er, dRdE_standard(Er, 32, Avals['Ge74']-32,  m_x, sigma), label=r'${\rmGe}$')
   plt.xlim(xmin=0.0,xmax=200)
   plt.legend(fontsize=16)
   plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=18)
