@@ -3,8 +3,10 @@ dependencies:
   - python
   - numpy
   - pip
+  - setuptools
+  - matplotlib
+  - jupyterlab
   - pip:
-    - matplotlib
-    - scipy
+    - jupyterlab_latex
 
 
