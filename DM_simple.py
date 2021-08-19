@@ -192,6 +192,7 @@ def plot_bin_for_exposure(Eth, m_x, sigma):
   plt.show()
 
 import ipywidgets as widgets
-sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42, description=r'$\sigma\,\, \left[\rm{cm}^2\right]$')
-mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, description=r'$m_{\rm DM}\,\, \left[\rm{GeV}\right]$')
-Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0, description=r'$E_{\rm{th}}\,\,\left[\rm{keV}\right]$')
+
+sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42, description=r'$\sigma\,\, \left[\rm{cm}^2\right]$',layout={'width': '500px'})
+mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, description=r'$m_{\rm DM}\,\, \left[\rm{GeV}\right]$',layout={'width': '500px'})
+Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0, description=r'$E_{\rm{th}}\,\,\left[\rm{keV}\right]$',layout={'width': '500px'})
