@@ -177,22 +177,27 @@ def plot_bin_for_Eth(Eth, m_x,sigma):
 
   plt.show()
 
-def plot_bin_for_exposure(Eth, m_x, sigma):
+
+def plot_bin_reconstruction(Eth,exposure, m_x, sigma):
   Emax=50.0
-  E1 = np.linspace(5.0, Emax, 10)
+  E1 = np.linspace(Eth, Emax, 10)
   Estep = E1[1]-E1[0]
   E2 =np.linspace(E1[0]+Estep, E1[-1]+Estep, 10)
-  Nevents = Nevents_standard(Eth, Emax, 74, 132-74, m_x, sigma)
-  plt.bar((Eth+Emax)/2,Nevents, width=Emax-Eth, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue")
+  Data_recon = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 5e-45)
+  Nevents = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma)
+  plt.bar((E1+E2)/2,Nevents, width=E2-E1, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue")
+  plt.bar((E1+E2)/2,Data_recon, width=E2-E1, color="None", edgecolor="k", label=r'Observed')
+  plt.legend(fontsize=14)
   plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=18)
   plt.ylabel(r'${\rm Counts }\,\,{\rm kg}^{-1}{\rm days}^{-1}$', size=18)
   plt.xlim(xmin=0.0,xmax=55.0)
-  plt.ylim(ymin=0.0)
+  plt.ylim(ymin=0.0, ymax=10.0)
 
   plt.show()
 
 import ipywidgets as widgets
 
-sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42, description=r'$\sigma\,\, (\rm{cm}^2)$')
-mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, description=r'$m_{\rm DM}\,\, (\rm{GeV})$')
-Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0, description=r'$E_{\rm{th}}\,\,(\rm{keV})$')
+sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42,step=0.01, description=r'$\sigma\,\, (\rm{cm}^2)$')
+mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, step=0.01, description=r'$m_{\rm DM}\,\, (\rm{GeV})$')
+Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0,step=0.1, description=r'$E_{\rm{th}}\,\,(\rm{keV})$')
+expo_slide = widgets.FloatLogSlider(value = 1.0, min = np.log10(1.0), max=5.0,step=0.1, description=r'$\epsilon\, (\rm{kg}\, \rm{days})$')
