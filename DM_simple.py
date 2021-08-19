@@ -162,16 +162,16 @@ def plot_spec(m_x, sigma):
   plt.semilogy(Er, dRdE_standard(Er, 32, Avals['Ge74']-32,  m_x, sigma), label=r'${\rmGe}$')
   plt.xlim(xmin=0.0,xmax=200)
   plt.legend(fontsize=16)
-  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=18)
-  plt.ylabel(r'${\rm d}R/{\rm d}E_R\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=18)
+  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
+  plt.ylabel(r'${\rm d}R/{\rm d}E_R\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=16)
   plt.show()
 
 def plot_bin_for_Eth(Eth, m_x,sigma):
   Emax=50.0
   Nevents = Nevents_standard(Eth, Emax, 74, 132-74, m_x, sigma)
   plt.bar((Eth+Emax)/2,Nevents, width=Emax-Eth, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue")
-  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=18)
-  plt.ylabel(r'${\rm Counts }\,\,{\rm kg}^{-1}{\rm days}^{-1}$', size=18)
+  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
+  plt.ylabel(r'${\rm Counts }\,\,{\rm kg}^{-1}{\rm days}^{-1}$', size=16)
   plt.xlim(xmin=0.0,xmax=55.0)
   plt.ylim(ymin=0.0)
 
@@ -193,6 +193,9 @@ def plot_bin_for_exposure(Eth, m_x, sigma):
 
 import ipywidgets as widgets
 
-sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42, description=r'$\sigma\,\, \left[\rm{cm}^2\right]$',layout={'width': '500px'})
-mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, description=r'$m_{\rm DM}\,\, \left[\rm{GeV}\right]$',layout={'width': '500px'})
-Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0, description=r'$E_{\rm{th}}\,\,\left[\rm{keV}\right]$',layout={'width': '500px'})
+sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42, description=r'$\sigma\,\, \left[\rm{cm}^2\right]$',
+                                      layout={'width': '500px', 'height': '10px'})
+mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, description=r'$m_{\rm DM}\,\, \left[\rm{GeV}\right]$',
+                                      layout={'width': '500px', 'height': '10px'})
+Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0, description=r'$E_{\rm{th}}\,\,\left[\rm{keV}\right]$',
+                                      layout={'width': '500px', 'height': '10px'})
