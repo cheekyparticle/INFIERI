@@ -1,8 +1,10 @@
+name: example-environment
 dependencies:
   - python
   - numpy
-  - matplotlib
-  - scipy
   - pip
+  - pip:
+  	- matplotlib
+  	- scipy
 
 
