@@ -16,6 +16,7 @@ Avals = dict(zip(target_list, A_list))
 
 import matplotlib.pyplot as plt
 from matplotlib import rc, rcParams
+import math
 
 
 #---------------------------------------------------------
@@ -166,14 +167,33 @@ def plot_spec(m_x, sigma):
   plt.ylabel(r'${\rm d}R/{\rm d}E_R\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=16)
   plt.show()
 
-def plot_bin_for_Eth(Eth, m_x,sigma):
+def plot_spec_xe(m_x, sigma):
+  Er = np.linspace(0.01, 60, 200)
+  plt.semilogy(Er, dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma), label=r'$\rm Xe}$')
+  plt.xlim(xmin=0.0,xmax=60)
+  plt.legend(fontsize=16)
+  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
+  plt.ylabel(r'${\rm d}R/{\rm d}E_R\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=16)
+  plt.show()
+
+def plot_for_Eth(Eth, m_x,sigma):
+  Er = np.linspace(0.0001, 60, 200)
+  drde = dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma)
+  plt.semilogy(Er, drde, label=r'$\rm Xe}$')
+  plt.axvline(x=Eth, color='k', linestyle='dashed')
   Emax=50.0
   Nevents = Nevents_standard(Eth, Emax, 74, 132-74, m_x, sigma)
-  plt.bar((Eth+Emax)/2,Nevents, width=Emax-Eth, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue")
+  #print(Nevents)
+  if Nevents > 0:
+    plt.text(15, drde[0]*0.5, r'$\rm{Counts}=%.2f\times 10^{%i}\,{\rm kg}^{-1}\,\,{\rm days}^{-1}$ '%(Nevents/(10**math.floor(np.log10(Nevents))), math.floor(np.log10(Nevents))) , fontsize=14)
+  else: 
+    plt.text(15, drde[0]*0.5, r'$\rm{Counts}=0 \,{\rm kg}^{-1}\,\,{\rm days}^{-1}$ ', fontsize=14)
+
+  #plt.bar((Eth+Emax)/2,Nevents, width=Emax-Eth, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue")
   plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
-  plt.ylabel(r'${\rm Counts }\,\,{\rm kg}^{-1}{\rm days}^{-1}$', size=16)
-  plt.xlim(xmin=0.0,xmax=55.0)
-  plt.ylim(ymin=0.0)
+  plt.ylabel(r'${\rm d}R/{\rm d}E_R\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=16)
+  plt.xlim(xmin=0.0,xmax=60.0)
+  #plt.ylim(ymin=0.0)
 
   plt.show()
 
@@ -183,13 +203,13 @@ def plot_bin_reconstruction(Eth,exposure, m_x, sigma):
   E1 = np.linspace(Eth, Emax, 10)
   Estep = E1[1]-E1[0]
   E2 =np.linspace(E1[0]+Estep, E1[-1]+Estep, 10)
-  Data_recon = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 5e-45)
+  Data_recon = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 2e-46)
   Nevents = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma)
-  plt.bar((E1+E2)/2,Nevents, width=E2-E1, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue")
+  plt.bar((E1+E2)/2,Nevents, width=E2-E1, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue", label='Theory')
   plt.bar((E1+E2)/2,Data_recon, width=E2-E1, color="None", edgecolor="k", label=r'Observed')
   plt.legend(fontsize=14)
   plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=18)
-  plt.ylabel(r'${\rm Counts }\,\,{\rm kg}^{-1}{\rm days}^{-1}$', size=18)
+  plt.ylabel(r'${\rm Counts }$', size=18)
   plt.xlim(xmin=0.0,xmax=55.0)
   plt.ylim(ymin=0.0, ymax=10.0)
 
@@ -197,7 +217,91 @@ def plot_bin_reconstruction(Eth,exposure, m_x, sigma):
 
 import ipywidgets as widgets
 
-sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42,step=0.01, description=r'$\sigma\,\, (\rm{cm}^2)$')
-mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, step=0.01, description=r'$m_{\rm DM}\,\, (\rm{GeV})$')
-Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0,step=0.1, description=r'$E_{\rm{th}}\,\,(\rm{keV})$')
-expo_slide = widgets.FloatLogSlider(value = 1.0, min = np.log10(1.0), max=5.0,step=0.1, description=r'$\epsilon\, (\rm{kg}\, \rm{days})$')
+sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42,step=0.01,
+                                      layout={"width" : "400px"}, description=r'$\sigma\,\, (\rm{cm}^2)$')
+mdm_slide = widgets.FloatLogSlider(value = 100, min = np.log10(1.0), max=3, step=0.01,
+                                    layout={"width":"400px"}, description=r'$m_{\rm DM}\,\, (\rm{GeV})$')
+Eth_slide = widgets.FloatSlider(value = 10.0, min = 1.0, max=20.0,step=0.1,
+                                layout={"width":"400px"}, description=r'$E_{\rm{th}}\,\,(\rm{keV})$')
+expo_slide = widgets.FloatLogSlider(value = 1.0, min = np.log10(1.0), max=5.0,step=0.1,
+                                    layout={"width":"400px"}, description=r'$\epsilon\, (\rm{kg}\, \rm{days})$')
+
+g2_expo_slide = widgets.FloatLogSlider(value = 2e4, min = 4.0, max=6.0,step=0.1,
+                                      layout={"width":"400px"}, description=r'$\epsilon\, (\rm{kg}\, \rm{days})$')
+
+def read_efficiency():
+  from scipy.interpolate import interp1d
+  
+  efficiency = np.genfromtxt('Xenon1t.dat')
+  xe1t_eff = interp1d(efficiency[:,0], efficiency[:,1], kind='linear', bounds_error=False, 
+                      fill_value=0.0)
+  return xe1t_eff
+
+def plot_efficiency():
+  eff = read_efficiency()
+  Er = np.linspace(0,60,200)
+  plt.plot(Er, eff(Er))
+  plt.xlim(xmin=0.0,xmax=60.0)
+  plt.ylim(ymin=0.0, ymax=1.0)
+  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
+  
+  plt.ylabel(r'${\rm Efficiency}$', size=16)
+  plt.show()
+
+def plot_xe1t_bin_eff(m_x, sigma):
+  Emax=50.0
+  Eth = 2.0
+  exposure = 0.9*1e3*278.8*0.475
+  E1 = np.linspace(Eth, Emax, 12)
+  Estep = E1[1]-E1[0]
+  E2 =np.linspace(E1[0]+Estep, E1[-1]+Estep, 12)
+  efficiency = read_efficiency()
+  #Data_recon = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 5e-45)
+  eff_events = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma, eff = efficiency )
+  Nevents = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma)
+  plt.bar((E1+E2)/2,Nevents, width=E2-E1, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue", label=r'$\rm{w/o\,\, eff}$')
+  plt.bar((E1+E2)/2,eff_events, width=E2-E1, color="None", edgecolor="k", label=r'$\rm{w\,\,eff}$')
+  plt.legend(fontsize=14)
+  plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=18)
+  plt.ylabel(r'${\rm Counts }\,\,{\rm kg}^{-1}{\rm days}^{-1}$', size=18)
+  plt.xlim(xmin=0.0,xmax=55.0)
+  #plt.ylim(ymin=0.0, ymax=10.0)
+
+  plt.show()
+
+def Nevents_xenon_eff(Eth, exposure, m_x, sigma):
+  efficiency = read_efficiency()
+  Emax=50.0
+  Nevents = exposure*Nevents_standard(Eth, Emax, 74, 132-74, m_x, sigma, eff = efficiency)
+  return Nevents
+
+def find_sigma90(Eth, expo, m_x):
+
+  ref_sig = 1e-46
+  Nevents_ref = Nevents_xenon(Eth = Eth, exposure=expo, m_x = m_x, sigma=ref_sig)
+  sigma90 = (ref_sig*2.303)/Nevents_ref
+  
+
+  return sigma90
+
+def plot_exclusion(Eth, exposure):
+  mass_space = np.geomspace(6,1e3)
+  plt.loglog(mass_space,find_sigma90(Eth, exposure,mass_space))
+  plt.xlim(xmin=6.0,xmax=1e3)
+  plt.ylim(ymin=1e-47, ymax=2e-43)
+  plt.xlabel(r'$m_{\rm DM}\,\,\left[{\rm GeV}\right]$', size=18)
+  plt.ylabel(r'$\sigma\,\,\left[{\rm cm}^2\right]$', size=18)
+  plt.show()
+
+
+from IPython.display import HTML, display
+
+def set_background(color):    
+    script = (
+        "var cell = this.closest('.jp-CodeCell');"
+        "var editor = cell.querySelector('.jp-Editor');"
+        "editor.style.background='{}';"
+        "this.parentNode.removeChild(this)"
+    ).format(color)
+    
+    display(HTML('<img src onerror="{}" style="display:none">'.format(script)))
