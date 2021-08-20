@@ -18,7 +18,6 @@ import matplotlib.pyplot as plt
 from matplotlib import rc, rcParams
 import math
 
-
 #---------------------------------------------------------
 # Velocity integral eta
 def calcEta(vmin, vlag=230.0, sigmav=156.0,vesc=544.0):
@@ -37,6 +36,34 @@ def calcEta(vmin, vlag=230.0, sigmav=156.0,vesc=544.0):
   vel_integral = np.clip(vel_integral, 0, 1e30)
 
   return N*vel_integral
+
+
+def calcEta_day(vmin, vlag=230.0, sigmav=156.0,vesc=544.0, t=242.4125):
+  T=365.25
+  t0 =151.0
+  ve0 = 15.0
+  ve = vlag + ve0*np.cos(2*np.pi*(t-t0)/T)
+  eta = calcEta(vmin, vlag=ve)
+  return eta
+
+def vlag(vlag=230.0, t=242.4125):
+  T=365.25
+  t0 =151.0
+  ve0 = 15.0
+  ve = vlag + ve0*np.cos(2*np.pi*(t-t0)/T)
+
+  return ve
+
+def plot_eta(t): 
+  vmin = np.linspace(0.001, 600, 300)
+  plt.plot(vmin, calcEta(vmin), color='k', label=r'time average')
+  plt.plot(vmin, calcEta_day(vmin,t=t), label=(r'%i days after Jan 1'%t))
+  plt.ylim(ymax=0.004, ymin=1e-4)
+  plt.xlim(xmin=0.0, xmax=600)
+  plt.xlabel(r'$v_{\rm min}\,[{\rm km} {\rm s}^{-1}]$', size=16)
+  plt.ylabel(r'$\eta(v_{\rm min})$', size=16)
+  plt.legend(fontsize=14)
+  plt.show()
 
 #-----------------------------------------------------------
 # Minimum velocity 
@@ -145,15 +172,15 @@ def rate_germanium(Er, m_x, sigma):
 @np.vectorize
 def Nevents_standard(E_min, E_max, N_p, N_n, m_x, sig, eff=None,vlag=232.0, sigmav=156.0, vesc=544.0):
   if (eff == None):
-      integ = lambda x: dRdE_standard(x, N_p, N_n, m_x, sig)
+      integ = lambda x: dRdE_standard(x, N_p, N_n, m_x, sig, vlag=vlag)
       #print(" No efficiency!")
   else:
-      integ = lambda x: eff(x)*dRdE_standard(x, N_p, N_n, m_x, sig)
+      integ = lambda x: eff(x)*dRdE_standard(x, N_p, N_n, m_x, sig, vlag=vlag)
   return quad(integ, E_min, E_max)[0]
 
-def Nevents_xenon(Eth, exposure, m_x, sigma):
+def Nevents_xenon(Eth, exposure, m_x, sigma, vlag=232.0,):
   Emax=50.0
-  Nevents = exposure*Nevents_standard(Eth, Emax, 74, 132-74, m_x, sigma)
+  Nevents = exposure*Nevents_standard(Eth, Emax, 74, 132-74, m_x, sigma, vlag=vlag)
   return Nevents
 
 def plot_spec(m_x, sigma):
@@ -215,6 +242,98 @@ def plot_bin_reconstruction(Eth,exposure, m_x, sigma):
 
   plt.show()
 
+def plot_modulation(m_x, sigma, t1, t2):
+  fig, ax = plt.subplots(1,2, figsize=(12,5))
+
+  Er = np.linspace(0.01, 30, 200)
+  vlag1 = vlag(t=t1)
+  rate1 = dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma, vlag=vlag1)
+  ax[0].plot(Er, rate1, label=r'${\rm d}R/{\rm d}E_R(t1)$')
+  vlag2 = vlag(t=t2)
+  rate2 = dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma, vlag=vlag2)
+  ax[0].plot(Er, rate2, label=r'${\rm d}R/{\rm d}E_R(t2)$')
+  ax[0].set_xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
+  ax[0].set_ylabel(r'${\rm d}R/{\rm d}E_R\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=16)
+  ax[0].set_xlim(xmin=0.0,xmax=30.0)
+  ax[0].legend(fontsize=14)
+
+  modulation = 0.5*(rate2-rate1)
+  ax[1].plot(Er, modulation)
+  ax[1].set_xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
+  ax[1].set_ylabel(r'$\Delta(t_1,t_2)\,\,\left[{\rm keV}^{-1}{\rm kg}^{-1}{\rm days}^{-1}\right]$', size=16)
+  ax[1].set_xlim(xmin=0.0,xmax=30.0)
+  plt.tight_layout()
+  plt.show()
+
+
+
+def mod_timeseries(exposure,m_x, sigma, E1, E2):
+
+  S0_Data = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 2e-46)
+  #Data_recon = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 5e-45)
+  S0 = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma )
+  tjune = 151
+  tdec = 334
+  vjune = vlag(t=tjune)
+  vdec = vlag(t=tdec)
+  CountJune = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma, vlag=vjune )
+  Data_June = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 2e-46, vlag=vjune)
+
+  CountDec = exposure*Nevents_standard(E1, E2, 74, 132-74, m_x, sigma, vlag=vdec )
+  Data_Dec = exposure*Nevents_standard(E1, E2, 74, 132-74, 200, 2e-46, vlag=vdec)
+
+  Sm= 0.5*(CountJune - CountDec)
+  Sm_Data = 0.5*(Data_June-Data_Dec)
+
+  #print(Sm, CountJune, CountDec, vdec, vjune)
+
+  phase = 151.0
+  T = 365.25
+  t1 = np.linspace(0,365.25, 30)
+  tstep = t1[1]-t1[0]
+  t2 =np.linspace(t1[0]+tstep, t1[-1]+tstep, 30)
+
+  argt1 = 2*np.pi*(t1-phase)/T
+  argt2 = 2*np.pi*(t2-phase)/T
+  delt = t2-t1
+  #print(t1,t2)
+  res = Sm*(T/(2*np.pi))*(np.sin(argt2) - np.sin(argt1))
+  data_res =  Sm_Data*(T/(2*np.pi))*(np.sin(argt2) - np.sin(argt1))
+
+  return t1, t2, res, data_res
+
+
+def plot_modulation_timeseries(Eth, exposure, m_x, sigma):
+  
+  Emax=20.0
+  E1 = np.linspace(Eth, Emax, 4)
+  Estep = E1[1]-E1[0]
+  E2 =np.linspace(E1[0]+Estep, E1[-1]+Estep, 4)
+
+  fig, ax = plt.subplots(2,2, figsize=(12,10))
+  counter=0
+  for i in range(2):
+    for j in range(2):
+      t1, t2, res, data_res = mod_timeseries(exposure,m_x, sigma, E1[counter], E2[counter])
+      ax[i,j].bar((t1+t2)/2,res, width=t2-t1, color="dodgerblue", alpha=0.5, edgecolor="dodgerblue", label='Theory')
+      ax[i,j].bar((t1+t2)/2,data_res, width=t2-t1, color="None", alpha=0.5, edgecolor="k", label='observation')
+      
+      ax[i,j].set_title(r"$E_R=[%.1f-%.1f]\,{\rm keV}$"%(E1[counter], E2[counter]))
+      ax[i,j].legend(fontsize=14)
+      ax[i,j].set_xlabel(r'$t\,\,\left[{\rm keV}\right]$', size=18)
+      ax[i,j].set_ylabel(r'$\Delta\,{\rm Counts }$', size=18)
+      ax[i,j].set_xlim(xmin=0.0,xmax=365.0)
+      ax[i,j].set_ylim(ymin=-2.0, ymax=2.0)
+      counter += 1
+
+  plt.tight_layout()
+
+  plt.show()
+
+#def plot_mod_time_series
+  
+
+
 import ipywidgets as widgets
 
 sigma_slide = widgets.FloatLogSlider(value = 1e-45, min = -50, max = -42,step=0.01,
@@ -228,6 +347,15 @@ expo_slide = widgets.FloatLogSlider(value = 1.0, min = np.log10(1.0), max=5.0,st
 
 g2_expo_slide = widgets.FloatLogSlider(value = 2e4, min = 4.0, max=6.0,step=0.1,
                                       layout={"width":"400px"}, description=r'$\epsilon\, (\rm{kg}\, \rm{days})$')
+
+
+time_slide = widgets.IntSlider(value = 0, min = 0, max=366,step=1,
+                                    layout={"width":"400px"}, description=r'Days since Jan 1')
+
+time_slide1 = widgets.IntSlider(value = 0, min = 0, max=366,step=1,
+                                    layout={"width":"400px"}, description=r'time1')
+time_slide2 = widgets.IntSlider(value = 0, min = 0, max=366,step=1,
+                                    layout={"width":"400px"}, description=r'time 2')
 
 def read_efficiency():
   from scipy.interpolate import interp1d
