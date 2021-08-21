@@ -320,7 +320,7 @@ def plot_modulation_timeseries(Eth, exposure, m_x, sigma):
       
       ax[i,j].set_title(r"$E_R=[%.1f-%.1f]\,{\rm keV}$"%(E1[counter], E2[counter]))
       ax[i,j].legend(fontsize=14)
-      ax[i,j].set_xlabel(r'$t\,\,\left[{\rm keV}\right]$', size=18)
+      ax[i,j].set_xlabel(r'$t\,\,[{\rm days}]$', size=18)
       ax[i,j].set_ylabel(r'$\Delta\,{\rm Counts }$', size=18)
       ax[i,j].set_xlim(xmin=0.0,xmax=365.0)
       ax[i,j].set_ylim(ymin=-2.0, ymax=2.0)
