@@ -1,7 +1,7 @@
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cheekyparticle/INFIERI/HEAD?filepath=INFIERI_SCHOOL.ipynb)
+
 # INFIERI
 for INFIERI summer school
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/cheekyparticle/INFIERI/HEAD?filepath=INFIERI_SCHOOL.ipynb)
 
 Written by Andrew Cheek and David Cerdeño
 
