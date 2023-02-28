@@ -187,7 +187,7 @@ def plot_spec(m_x, sigma):
   Er = np.linspace(0.01, 200, 200)
   plt.semilogy(Er, dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma), label=r'$\rm Xe}$')
   plt.semilogy(Er, dRdE_standard(Er, 18, Avals['Ar40']-18,  m_x, sigma), label=r'${\rm Ar}$')
-  plt.semilogy(Er, dRdE_standard(Er, 32, Avals['Ge74']-32,  m_x, sigma), label=r'${\rmGe}$')
+  plt.semilogy(Er, dRdE_standard(Er, 32, Avals['Ge74']-32,  m_x, sigma), label=r'${\rm Ge}$')
   plt.xlim(xmin=0.0,xmax=200)
   plt.legend(fontsize=16)
   plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
@@ -196,7 +196,7 @@ def plot_spec(m_x, sigma):
 
 def plot_spec_xe(m_x, sigma):
   Er = np.linspace(0.01, 60, 200)
-  plt.semilogy(Er, dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma), label=r'$\rm Xe}$')
+  plt.semilogy(Er, dRdE_standard(Er, 74, Avals['Xe132']-74,  m_x, sigma), label=r'${\rm Xe}$')
   plt.xlim(xmin=0.0,xmax=60)
   plt.legend(fontsize=16)
   plt.xlabel(r'$E_{R}\,\,\left[{\rm keV}\right]$', size=16)
